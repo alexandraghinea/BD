@@ -1,0 +1,139 @@
+--ex12)---------------
+
+
+--1)
+--sa se afiseze pentru fiecare client numele acestuia, suma plătită și statusul rezervarii –pentru proprietățile din București în
+--ordinea sumelor 
+–Am folosit:
+-nvl, decode, ordonare și subcereri  sincronizate
+
+SELECT c.nume_client, p.nume, nvl(pa.suma,0) AS pret_proprietate, DECODE(r.status_rezervare, 'confirmata', 'Rezervare confirmată', 'in asteptare', 'Rezervare în așteptare') AS status_rezervare
+FROM client c
+JOIN rezervare r ON c.id_client = r.id_client
+JOIN proprietate p ON r.id_proprietate = p.id_proprietate
+JOIN plata pa ON pa.id_rezervare=r.id_rezervare
+WHERE EXISTS (
+  SELECT 1
+  FROM proprietar pr
+  JOIN utilizator u ON pr.id_utilizator = u.id_utilizator
+  JOIN adresa a ON p.id_adresa = a.id_adresa
+  WHERE p.id_proprietar = pr.id_proprietar
+    AND a.oras = 'București'
+)
+ORDER BY c.nume_client;
+
+--2)
+--sa se afiseze proprietarii care au cel puțin 2 proprietăți de tip 'Casa' si pretul mediu al acestora
+–Am folosit:
+–grupări de date cu subcereri nesincronizate în care intervin cel puțin 3 tabele, funcții –grup, filtrare la nivel de grupuri (în cadrul aceleiași cereri)
+
+SELECT p.nume_proprietar, AVG(pr.pret) AS pret_mediu, proprietati.numar_proprietati
+FROM proprietar p
+JOIN proprietate pr ON pr.id_proprietar = p.id_proprietar
+JOIN categorie_proprietate cp ON cp.id_categorie = pr.id_categorie
+JOIN (
+    SELECT p.id_proprietar, COUNT(DISTINCT p.id_proprietate) AS numar_proprietati
+    FROM proprietate p
+    JOIN categorie_proprietate cp ON cp.id_categorie = p.id_categorie
+    WHERE cp.nume_categorie = 'Casa'
+    GROUP BY p.id_proprietar
+    HAVING COUNT(DISTINCT p.id_proprietate) >= 2
+) proprietati ON proprietati.id_proprietar = p.id_proprietar
+WHERE cp.nume_categorie = 'Casa'
+GROUP BY p.nume_proprietar, proprietati.numar_proprietati;
+
+--3)
+–-sa se afiseze numele proprietarilor, totalul rezervarilor si media ratingurilor pentru 
+--proprietățile asociate fiecărui proprietar
+–Am folosit:
+-subcereri nesincronizate în clauza from
+
+select p.nume_proprietar, t.total_rezervari, r.medie_rating
+from proprietar p
+JOIN (SELECT pr.id_proprietar, COUNT(*) as total_rezervari
+      from rezervare r
+      JOIN proprietate pr ON r.id_proprietate = pr.id_proprietate
+      group by pr.id_proprietar) t ON t.id_proprietar = p.id_proprietar
+JOIN (SELECT pr.id_proprietar, AVG(rec.rating) as medie_rating
+      from recenzie rec
+      JOIN proprietate pr ON rec.id_proprietate = pr.id_proprietate
+      group by pr.id_proprietar) r ON r.id_proprietar = p.id_proprietar;
+
+      
+--4)
+– selectează numele clienților, nr. total de rezervari si suma totală a plăților pentru 
+--clienții care au cel puțin 1 rezervare
+–Am folosit:
+-with, grupări de date cu subcereri nesincronizate în care intervin cel puțin 3 tabele
+
+with rezervari_total_plata as(
+select r.id_client, count(*) as total_rezervari, SUM(P.suma) as suma_totala
+from rezervare r
+inner join client c on r.id_client=c.id_client
+inner join plata p on r.id_rezervare=p.id_rezervare
+group by r.id_client
+having count(*) >=1
+)
+select c.nume_client, r.total_rezervari, r.suma_totala
+from rezervari_total_plata r
+inner join client c on r.id_client=c.id_client;
+
+--5)
+–va afișa numele proprietarului cu majuscule concatenat cu nr său de telefon și data de început a rezervarii cu o alta formatare
+--și case pentru diferite preturi
+–Am folosit:
+–utilizarea a cel puțin 2 funcții pe șiruri de caractere, 2 funcții pe date calendaristice, a
+-cel puțin unei expresii CASE
+
+
+SELECT 
+    CONCAT(CONCAT(UPPER(p.nume_proprietar), ' - '), p.telefon_proprietar) AS detalii_proprietar_proprietate,
+    TO_CHAR(r.data_inceput, 'MM-DD-YYYY') AS data_inceput_formatata,
+     CASE
+           WHEN pr.pret < 100 THEN 'Ieftin'
+           WHEN pr.pret >= 100 AND pr.pret <= 500 THEN 'Mediu'
+           ELSE 'Scump'
+      END AS categorie_pret
+FROM 
+    proprietar p
+INNER JOIN 
+    proprietate pr ON p.id_proprietar = pr.id_proprietar
+INNER JOIN 
+    rezervare r ON pr.id_proprietate = r.id_proprietate
+GROUP BY 
+    p.nume_proprietar, p.telefon_proprietar, r.data_inceput, r.data_sfarsit, pr.pret
+HAVING 
+    TO_CHAR(EXTRACT(YEAR FROM r.data_sfarsit)) = '2023';
+
+
+--ex13-------------------
+
+--vrem sa actualizam emailul utilizatorului care are numele de utilizator
+--andreea_popa
+
+UPDATE utilizator
+SET email= 'alt_nume.gmail.com'
+where id_utilizator=( select id_utilizator from utilizator 
+where nume_utilizator='andreea_popa'
+);
+
+--actualizam statusul rezervarii pentru rezervarea a carei data de inceput este 5-11-2023
+UPDATE rezervare
+SET status_rezervare = 'in asteptare'
+WHERE id_rezervare = (
+    SELECT id_rezervare
+    FROM rezervare
+    WHERE data_inceput = TO_DATE('2023-11-05', 'YYYY-MM-DD')
+);
+
+
+--vrem sa stergem inregistrarile din facilitate_proprietate care sunt asociate
+--cu facilitati cu numele 'Piscină'
+DELETE from FACILITATE_PROPRIETATE
+WHERE id_facilitate IN (
+    select id_facilitate
+    from FACILITATE
+    WHERE nume_facilitate = 'Piscină'
+);
+
+

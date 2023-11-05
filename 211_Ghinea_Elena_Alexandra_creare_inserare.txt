@@ -1,0 +1,375 @@
+-------------------------------------------
+--ex10
+
+CREATE SEQUENCE secv_utilizator START WITH 1 INCREMENT BY 1;
+-------------------------------------------
+--ex11
+--1
+CREATE TABLE UTILIZATOR(
+id_utilizator NUMBER(6) primary key,
+nume_utilizator VARCHAR(50) NOT NULL,
+email VARCHAR(50)NOT NULL,
+parola VARCHAR(50)NOT NULL
+);
+
+--2
+CREATE TABLE PROPRIETAR(
+id_proprietar NUMBER(6) primary key,
+nume_proprietar VARCHAR(50) NOT NULL,
+email_proprietar VARCHAR(50) NOT NULL,
+telefon_proprietar VARCHAR(50) NOT NULL,
+id_utilizator NUMBER(6) NOT NULL,
+CONSTRAINT utilizator_fk FOREIGN KEY (id_utilizator) REFERENCES UTILIZATOR(id_utilizator)
+);
+
+ALTER TABLE proprietar
+DROP COLUMN email_proprietar;
+
+--3
+CREATE TABLE CLIENT(
+id_CLIENT NUMBER(6) primary key,
+nume_client VARCHAR(50) NOT NULL,
+email_client VARCHAR(50) NOT NULL,
+telefon_client VARCHAR(50) NOT NULL,
+id_utilizator NUMBER(6) NOT NULL,
+CONSTRAINT client_utilizator_fk FOREIGN KEY (id_utilizator) REFERENCES UTILIZATOR(id_utilizator)
+);
+
+ALTER TABLE client
+DROP COLUMN email_client;
+
+--4
+CREATE TABLE CATEGORIE_PROPRIETATE(
+id_categorie  NUMBER(6) primary key,
+nume_categorie VARCHAR(50) NOT NULL
+);
+
+--5
+CREATE TABLE ADRESA(
+id_adresa NUMBER(6) primary key,
+strada VARCHAR(100) NOT NULL,
+numar VARCHAR(10) NOT NULL,
+oras VARCHAR(50) NOT NULL,
+tara VARCHAR(50) NOT NULL
+);
+
+--6
+CREATE TABLE PROPRIETATE(
+id_proprietate NUMBER(6) primary key,
+nume VARCHAR(5) NOT NULL,
+pret NUMBER(10, 2) NOT NULL,
+descriere VARCHAR(100) NOT NULL,
+id_proprietar NUMBER(6) NOT NULL,
+id_categorie NUMBER(6) NOT NULL,
+id_adresa NUMBER(6) NOT NULL,
+CONSTRAINT proprietar_fk FOREIGN KEY (id_proprietar) REFERENCES PROPRIETAR (id_proprietar),
+CONSTRAINT categorie_fk FOREIGN KEY (id_categorie) REFERENCES CATEGORIE_PROPRIETATE (id_categorie),
+CONSTRAINT adresa_fk FOREIGN KEY (id_adresa) REFERENCES ADRESA (id_adresa)
+);
+
+--7
+CREATE TABLE REZERVARE(
+id_rezervare NUMBER(6) primary key,
+status_rezervare VARCHAR2(50) CHECK (status_rezervare IN ('confirmata', 'in asteptare')),
+data_inceput DATE NOT NULL,
+data_sfarsit DATE NOT NULL,
+id_client NUMBER(6) NOT NULL,
+id_proprietate NUMBER(6) NOT NULL,
+CONSTRAINT rezervare_client_fk FOREIGN KEY (id_client) REFERENCES CLIENT(id_client),
+CONSTRAINT rezervare_proprietate_fk FOREIGN KEY (id_proprietate) REFERENCES PROPRIETATE(id_proprietate)
+);
+
+--8
+CREATE TABLE RECENZIE(
+id_recenzie NUMBER(6) primary key,
+rating NUMBER(6) NOT NULL CHECK( RATING >=1 AND RATING<=5),
+comentariu VARCHAR(100),
+id_client NUMBER(6) NOT NULL,
+id_proprietate NUMBER(6) NOT NULL,
+CONSTRAINT recenzie_client_fk FOREIGN KEY (id_client) REFERENCES CLIENT (id_client),
+CONSTRAINT recenzie_proprietate_fk FOREIGN KEY (id_proprietate) REFERENCES PROPRIETATE (id_proprietate)
+);
+
+--9
+CREATE TABLE FACILITATE(
+id_facilitate  NUMBER(6) primary key,
+nume_facilitate VARCHAR(50) NOT NULL
+);
+
+--10
+CREATE TABLE FACILITATE_PROPRIETATE(
+id_facilitate_proprietate  NUMBER(6) primary key,
+id_facilitate NUMBER(6) NOT NULL,
+id_proprietate NUMBER(6) NOT NULL,
+CONSTRAINT fk_facilitate FOREIGN KEY (id_facilitate) REFERENCES FACILITATE (id_facilitate),
+CONSTRAINT fk_proprietate FOREIGN KEY (id_proprietate) REFERENCES PROPRIETATE (id_proprietate)
+);
+
+--11
+CREATE TABLE OFERTA(
+id_oferta NUMBER(6) primary key,
+descriere varchar(100),
+data_inceput DATE NOT NULL,
+data_sfarsit DATE NOT NULL,
+id_proprietate NUMBER(6) NOT NULL,
+CONSTRAINT oferta_proprietate_fk FOREIGN KEY (id_proprietate) REFERENCES PROPRIETATE(id_proprietate)
+);
+
+--12
+CREATE TABLE PLATA(
+id_plata NUMBER(6) primary key,
+metoda_plata VARCHAR(50) CHECK (metoda_plata IN ('online', 'numerar')),
+suma NUMBER(10, 2) CHECK (suma>=0),
+id_rezervare NUMBER(6) NOT NULL,
+CONSTRAINT plata__rezervare_fk FOREIGN KEY (id_rezervare) REFERENCES REZERVARE(id_rezervare)
+);
+
+------------------------------------------
+
+-------------------------------------------
+INSERT INTO UTILIZATOR (id_utilizator, nume_utilizator, email, parola)
+VALUES (secv_utilizator.NEXTVAL, 'ion_popescu', 'ion.popescu@gmail.com', 'adbifew');
+
+INSERT INTO UTILIZATOR (id_utilizator, nume_utilizator, email, parola)
+VALUES (secv_utilizator.NEXTVAL, 'maria.ionescu', 'maria.ionescu@gmail.com', 'vse5ge');
+
+INSERT INTO UTILIZATOR (id_utilizator, nume_utilizator, email, parola)
+VALUES (secv_utilizator.NEXTVAL, 'alexandru_radu', 'alexandru.radu@gmail.com', 'qedsfghj');
+
+INSERT INTO UTILIZATOR (id_utilizator, nume_utilizator, email, parola)
+VALUES (secv_utilizator.NEXTVAL, 'elena_dumitrescu', 'elena.dumitrescu@gmail.com', 'qa13v');
+
+INSERT INTO UTILIZATOR (id_utilizator, nume_utilizator, email, parola)
+VALUES (secv_utilizator.NEXTVAL, 'mihai_stoica', 'mihai.stoica@gmail.com', '124h5bh');
+
+INSERT INTO UTILIZATOR (id_utilizator, nume_utilizator, email, parola)
+VALUES (secv_utilizator.NEXTVAL, 'andreea_popa', 'andreea.popa@gmail.com', 'sfdg876');
+
+INSERT INTO UTILIZATOR (id_utilizator, nume_utilizator, email, parola)
+VALUES (secv_utilizator.NEXTVAL, 'gabriel_munteanu', 'gabriel.munteanu@gmail.com', 'bngbfv');
+
+INSERT INTO UTILIZATOR (id_utilizator, nume_utilizator, email, parola)
+VALUES (secv_utilizator.NEXTVAL, 'cristina_stan', 'cristina.stan@gmail.com', 'edsvfea');
+
+INSERT INTO UTILIZATOR (id_utilizator, nume_utilizator, email, parola)
+VALUES (secv_utilizator.NEXTVAL, 'Laura_Stancu', 'laura.stancu@gmail.com', '54321');
+
+INSERT INTO UTILIZATOR (id_utilizator, nume_utilizator, email, parola)
+VALUES (secv_utilizator.NEXTVAL, 'Elena_Popovici', 'elena.popovici@gmail.com', 'lkjhg');
+
+-------------------------------
+
+INSERT INTO PROPRIETAR (id_proprietar, nume_proprietar, telefon_proprietar, id_utilizator)
+VALUES (1, 'Ion Popescu', '0721122334', 1);
+
+INSERT INTO PROPRIETAR (id_proprietar, nume_proprietar, telefon_proprietar, id_utilizator)
+VALUES (2, 'Maria Ionescu', '0734567890', 2);
+
+INSERT INTO PROPRIETAR (id_proprietar, nume_proprietar, telefon_proprietar, id_utilizator)
+VALUES (3, 'Alexandru Radu', '0767890123', 3);
+
+INSERT INTO PROPRIETAR (id_proprietar, nume_proprietar, telefon_proprietar, id_utilizator)
+VALUES (4, 'Elena Dumitrescu', '0745678901', 4);
+
+INSERT INTO PROPRIETAR (id_proprietar, nume_proprietar, telefon_proprietar, id_utilizator)
+VALUES (5, 'Mihai Stoica', '0723456789', 5);
+---------------------------------
+
+INSERT INTO CLIENT (id_client, nume_client, telefon_client, id_utilizator)
+VALUES (1, 'Andreea Popa', '0722112233', 6);
+
+INSERT INTO CLIENT (id_client, nume_client, telefon_client, id_utilizator)
+VALUES (2, 'Gabriel Munteanu', '0734455667', 7);
+
+INSERT INTO CLIENT (id_client, nume_client, telefon_client, id_utilizator)
+VALUES (3, 'Cristina Stan', '0767788990', 8);
+
+INSERT INTO CLIENT (id_client, nume_client, telefon_client, id_utilizator)
+VALUES (4, 'Laura Stancu', '0745123456', 9);
+
+INSERT INTO CLIENT (id_client, nume_client, telefon_client, id_utilizator)
+VALUES (5, 'Elena Popovici', '0723456789', 10);
+
+------------------------------
+
+INSERT INTO ADRESA (id_adresa, strada, numar, oras, tara)
+VALUES (1, 'Strada Florilor', '10A', 'București', 'România');
+
+INSERT INTO ADRESA (id_adresa, strada, numar, oras, tara)
+VALUES (2, 'Aleea Merelor', '3', 'Cluj', 'România');
+
+INSERT INTO ADRESA (id_adresa, strada, numar, oras, tara)
+VALUES (3, 'Bulevardul Pacii', '5', 'Constanta', 'România');
+
+INSERT INTO ADRESA (id_adresa, strada, numar, oras, tara)
+VALUES (4, 'Strada Muntelui', '21', 'Brasov', 'România');
+
+INSERT INTO ADRESA (id_adresa, strada, numar, oras, tara)
+VALUES (5, 'Bulevardul Mamaia', '9', 'Mamaia', 'România');
+
+-----------------------------
+
+INSERT INTO CATEGORIE_PROPRIETATE (id_categorie, nume_categorie)
+VALUES (1, 'Casa');
+
+INSERT INTO CATEGORIE_PROPRIETATE (id_categorie, nume_categorie)
+VALUES (2, 'Vila');
+
+INSERT INTO CATEGORIE_PROPRIETATE (id_categorie, nume_categorie)
+VALUES (3, 'Apartament');
+
+INSERT INTO CATEGORIE_PROPRIETATE (id_categorie, nume_categorie)
+VALUES (4, 'Cabana');
+
+INSERT INTO CATEGORIE_PROPRIETATE (id_categorie, nume_categorie)
+VALUES (5, 'Pensiune');
+---------------------
+
+INSERT INTO PROPRIETATE (id_proprietate, nume, pret, descriere, id_proprietar, id_categorie, id_adresa)
+VALUES (1, 'Casa', 250, 'O casă modernă și spațioasă într-o zonă liniștită.', 1, 1, 1);
+
+INSERT INTO PROPRIETATE (id_proprietate, nume, pret, descriere, id_proprietar, id_categorie, id_adresa)
+VALUES (2, 'Mona', 180, 'O vilă luxoasă cu vedere la munte aflată într-un complex rezidențial exclusivist.', 2, 2, 2);
+
+INSERT INTO PROPRIETATE (id_proprietate, nume, pret, descriere, id_proprietar, id_categorie, id_adresa)
+VALUES (3, 'Sunny', 400, 'O casa calduroasa cu vedere la mare protivita pentru familii mari.', 3, 1, 3);
+
+INSERT INTO PROPRIETATE (id_proprietate, nume, pret, descriere, id_proprietar, id_categorie, id_adresa)
+VALUES (4, 'Luna', 300, 'O vilă  exclusivistă cu facilități premium și servicii luxoase.', 4, 2, 4);
+
+INSERT INTO PROPRIETATE (id_proprietate, nume, pret, descriere, id_proprietar, id_categorie, id_adresa)
+VALUES (5, 'Iris', 300, 'O casă specială și primitoare cu grădină privată.', 5, 1, 5);
+
+INSERT INTO PROPRIETATE (id_proprietate, nume, pret, descriere, id_proprietar, id_categorie, id_adresa)
+VALUES (6, 'Casa', 250, 'O casa aflata intr-o zona linistita.', 1, 1, 1);
+
+INSERT INTO PROPRIETATE (id_proprietate, nume, pret, descriere, id_proprietar, id_categorie, id_adresa)
+VALUES (7, 'Casa', 250, 'O casa perfecta pentru vacantele la mare', 2,2,2);
+select*from proprietate;
+-------------------
+
+INSERT INTO REZERVARE (id_rezervare, status_rezervare, data_inceput, data_sfarsit, id_client, id_proprietate)
+VALUES (1, 'confirmata', DATE '2023-06-01', DATE '2023-06-07', 1, 1);
+
+INSERT INTO REZERVARE (id_rezervare, status_rezervare, data_inceput, data_sfarsit, id_client, id_proprietate)
+VALUES (2, 'in asteptare', DATE '2023-07-15', DATE '2023-07-22', 2, 2);
+
+INSERT INTO REZERVARE (id_rezervare, status_rezervare, data_inceput, data_sfarsit, id_client, id_proprietate)
+VALUES (3, 'confirmata', DATE '2023-08-10', DATE '2023-08-17', 3, 3);
+
+INSERT INTO REZERVARE (id_rezervare, status_rezervare, data_inceput, data_sfarsit, id_client, id_proprietate)
+VALUES (4, 'confirmata', DATE '2023-09-05', DATE '2023-09-12', 4, 4);
+
+INSERT INTO REZERVARE (id_rezervare, status_rezervare, data_inceput, data_sfarsit, id_client, id_proprietate)
+VALUES (5, 'in asteptare', DATE '2023-10-20', DATE '2023-10-27', 5, 5);
+
+INSERT INTO REZERVARE (id_rezervare, status_rezervare, data_inceput, data_sfarsit, id_client, id_proprietate)
+VALUES (6, 'confirmata', DATE '2023-11-05', DATE '2023-11-12', 3, 4);
+
+INSERT INTO REZERVARE (id_rezervare, status_rezervare, data_inceput, data_sfarsit, id_client, id_proprietate)
+VALUES (7, 'confirmata', DATE '2023-12-05', DATE '2023-12-12', 4, 5);
+--------------------------------
+
+INSERT INTO RECENZIE (id_recenzie, rating, id_client, id_proprietate)
+VALUES (1, 4.5, 1, 1);
+
+INSERT INTO RECENZIE (id_recenzie, rating, id_client, id_proprietate)
+VALUES (2, 3.8, 2, 2);
+
+INSERT INTO RECENZIE (id_recenzie, rating, comentariu, id_client, id_proprietate)
+VALUES (3, 5.0, 'Sunt extrem de mulțumit de servicii. Recomand cu încredere!', 3, 3);
+
+INSERT INTO RECENZIE (id_recenzie, rating, comentariu, id_client, id_proprietate)
+VALUES (4, 2.5, 'M-am simțit dezamăgit de calitatea proprietății.', 4, 4);
+
+INSERT INTO RECENZIE (id_recenzie, rating, comentariu, id_client, id_proprietate)
+VALUES (5, 4.2, 'O experiență plăcută într-o locație excelentă.', 5, 5);
+
+INSERT INTO RECENZIE (id_recenzie, rating, id_client, id_proprietate)
+VALUES (6, 3.5, 3, 2);
+
+INSERT INTO RECENZIE (id_recenzie, rating, id_client, id_proprietate)
+VALUES (7, 5, 2, 4);
+
+--------------------------------
+
+INSERT INTO FACILITATE (id_facilitate, nume_facilitate)
+VALUES (1, 'Piscină');
+
+INSERT INTO FACILITATE (id_facilitate, nume_facilitate)
+VALUES (2, 'Parcare');
+
+INSERT INTO FACILITATE (id_facilitate, nume_facilitate)
+VALUES (3, 'Wi-Fi');
+
+INSERT INTO FACILITATE (id_facilitate, nume_facilitate)
+VALUES (4, 'Grătar');
+
+INSERT INTO FACILITATE (id_facilitate, nume_facilitate)
+VALUES (5, 'Aer condiționat');
+
+--------------------------------
+
+INSERT INTO FACILITATE_PROPRIETATE (id_facilitate_proprietate, id_facilitate, id_proprietate)
+VALUES (1, 1, 1);
+
+INSERT INTO FACILITATE_PROPRIETATE (id_facilitate_proprietate, id_facilitate, id_proprietate)
+VALUES (2, 2, 2);
+
+INSERT INTO FACILITATE_PROPRIETATE (id_facilitate_proprietate, id_facilitate, id_proprietate)
+VALUES (3, 3, 3);
+
+INSERT INTO FACILITATE_PROPRIETATE (id_facilitate_proprietate, id_facilitate, id_proprietate)
+VALUES (4, 4, 4);
+
+INSERT INTO FACILITATE_PROPRIETATE (id_facilitate_proprietate, id_facilitate, id_proprietate)
+VALUES (5, 5, 5);
+
+INSERT INTO FACILITATE_PROPRIETATE (id_facilitate_proprietate, id_facilitate, id_proprietate)
+VALUES (6, 2, 1);
+
+INSERT INTO FACILITATE_PROPRIETATE (id_facilitate_proprietate, id_facilitate, id_proprietate)
+VALUES (7, 3, 2);
+
+INSERT INTO FACILITATE_PROPRIETATE (id_facilitate_proprietate, id_facilitate, id_proprietate)
+VALUES (8, 4, 3);
+
+INSERT INTO FACILITATE_PROPRIETATE (id_facilitate_proprietate, id_facilitate, id_proprietate)
+VALUES (9, 5, 4);
+
+INSERT INTO FACILITATE_PROPRIETATE (id_facilitate_proprietate, id_facilitate, id_proprietate)
+VALUES (10, 1, 5);
+
+--------------------------
+INSERT INTO OFERTA (id_oferta, descriere, data_inceput, data_sfarsit, id_proprietate)
+VALUES (1, 'Reducere de 10% pentru rezervări în luna iunie', TO_DATE('2023-06-01', 'YYYY-MM-DD'), TO_DATE('2023-06-30', 'YYYY-MM-DD'), 1);
+
+INSERT INTO OFERTA (id_oferta, descriere, data_inceput, data_sfarsit, id_proprietate)
+VALUES (2, 'Ofertă specială: 3 nopți la preț de 2', TO_DATE('2023-07-15', 'YYYY-MM-DD'), TO_DATE('2023-07-18', 'YYYY-MM-DD'), 2);
+
+INSERT INTO OFERTA (id_oferta, descriere, data_inceput, data_sfarsit, id_proprietate)
+VALUES (3, 'Ofertă last-minute: reducere de 20% pentru rezervări în următoarele 3 zile', TO_DATE('2023-08-10', 'YYYY-MM-DD'), TO_DATE('2023-08-13', 'YYYY-MM-DD'), 3);
+
+INSERT INTO OFERTA (id_oferta, descriere, data_inceput, data_sfarsit, id_proprietate)
+VALUES (4, 'Pachet all-inclusive: masă și băuturi incluse în preț', TO_DATE('2023-09-01', 'YYYY-MM-DD'), TO_DATE('2023-09-07', 'YYYY-MM-DD'), 4);
+
+INSERT INTO OFERTA (id_oferta, descriere, data_inceput, data_sfarsit, id_proprietate)
+VALUES (5, 'Ofertă de iarnă: cazare gratuită pentru copiii sub 12 ani', TO_DATE('2023-12-20', 'YYYY-MM-DD'), TO_DATE('2023-12-27', 'YYYY-MM-DD'), 5);
+
+-----------------------------------------
+
+INSERT INTO PLATA (id_plata, metoda_plata, suma, id_rezervare)
+VALUES (1, 'online', 500, 1);
+
+INSERT INTO PLATA (id_plata, metoda_plata, suma, id_rezervare)
+VALUES (2, 'online', 800, 2);
+
+INSERT INTO PLATA (id_plata, metoda_plata, suma, id_rezervare)
+VALUES (3, 'online', 350, 3);
+
+INSERT INTO PLATA (id_plata, metoda_plata, suma, id_rezervare)
+VALUES (4, 'numerar', 250, 4);
+
+INSERT INTO PLATA (id_plata, metoda_plata, suma, id_rezervare)
+VALUES (5, 'online', 600, 5);
+
